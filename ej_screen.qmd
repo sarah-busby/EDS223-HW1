@@ -2,10 +2,14 @@
 title: EDS 223 HW1
 subtitle: Lead paint risk in Philadelphia
 author: Sarah Busby
-format: html
+format:
+  pdf:
+    colorlinks: true
 ---
 # Mapping disproportionate levels of lead paint risk in Philadelphia County
-As a
+As an old city, Philadelphia
+
+**Objective:** Visualize the distribution between percent lead paint risk and percent people of color in Philadelphia County Census Blocks.
 
 ## Load packages
 ```{r}
@@ -17,6 +21,7 @@ library(stars)
 ```
 
 ## Import data
+
 ```{r}
 # Read in geodatabase of EJScreen data at the Census Block Group level
 ejscreen <- sf::st_read(here::here("data", "ejscreen","EJSCREEN_2023_BG_StatePct_with_AS_CNMI_GU_VI.gdb")) 
