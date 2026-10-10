@@ -1,3 +1,13 @@
+---
+title: EDS 223 HW1
+subtitle: Lead paint risk in Philadelphia
+author: Sarah Busby
+format: html
+---
+# Mapping disproportionate levels of lead paint risk in Philadelphia County
+As a
+
+## Load packages
 ```{r}
 library(tidyverse)
 library(sf)
@@ -5,39 +15,55 @@ library(here)
 library(tmap)
 library(stars)
 ```
+
+## Import data
 ```{r}
-# read in geodatabase of EJScreen data at the Census Block Group level
+# Read in geodatabase of EJScreen data at the Census Block Group level
 ejscreen <- sf::st_read(here::here("data", "ejscreen","EJSCREEN_2023_BG_StatePct_with_AS_CNMI_GU_VI.gdb")) 
 ```
 
 ```{r}
-# filter to a state you are interested in
-pennsylvania <- ejscreen %>%
-  dplyr::filter(ST_ABBREV == "PA") 
+# Filter to Pennsylvania
+pennsylvania <- ejscreen |> 
+    dplyr::filter(ST_ABBREV == "PA") 
 
-# filter to a county you are interested in
-philadelphia <- ejscreen %>%
-  dplyr::filter(CNTY_NAME %in% c("Philadelphia County"))
-```
-```{r}
-head(philadelphia['PEOPCOLOR'])
-```
-```{r}
-tm_shape(philadelphia['Shape']) +
-    tm_borders() + 
-tm_shape(philadelphia['PEOPCOLORPCT']) +
-    tm_polygons(fill = 'PEOPCOLORPCT')
-```
-```{r}
-tm_shape(philadelphia['Shape']) +
-    tm_borders() + 
-tm_shape(philadelphia['PEOPCOLORPCT']) +
-    tm_polygons(fill = 'PEOPCOLORPCT')
+# Filter to Philadelphia County
+philadelphia <- ejscreen |> 
+    dplyr::filter(CNTY_NAME %in% c("Philadelphia County"))
 ```
 
+## Visualize Data
 ```{r}
-tm_shape(philadelphia['Shape']) +
+# Plot percent people of color at census block level
+pct_ppl_color <- tm_shape(philadelphia['Shape']) +
     tm_borders() + 
-tm_shape(philadelphia['B_LDPNT']) +
-    tm_polygons(fill = 'B_LDPNT')
+tm_shape(philadelphia['PEOPCOLORPCT']) +
+    tm_polygons(
+        fill = 'PEOPCOLORPCT',
+        fill.scale = tm_scale(values = 'Orange'),
+        fill.legend = tm_legend(title = "Percent people of color")) +
+tm_title("Percent people of color at census block level in Philadelphia County") +
+tm_compass() +
+tm_scalebar()
 ```
+
+```{r}
+# Plot percent housing units built before 1960 (lead risk)
+pct_pb_pnt <- tm_shape(philadelphia['Shape']) +
+    tm_borders() + 
+tm_shape(philadelphia['P_LDPNT']) +
+    tm_polygons(
+        fill = 'P_LDPNT',
+        fill.scale = tm_scale(values = 'Orange'),
+        fill.legend = tm_legend(title = "Percent housing units built before 1960 in Philadelphia"),
+        ) +
+tm_compass() +
+tm_scalebar()
+```
+
+```{r}
+# Display maps side by side
+tmap_arrange(pct_ppl_color, pct_pb_pnt, ncol = 2)
+```
+
+## Map interpretation
