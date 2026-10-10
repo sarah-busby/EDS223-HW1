@@ -1,15 +1,15 @@
 ---
-title: EDS 223 HW1
-subtitle: Lead paint risk in Philadelphia
+title: EDS 223 HW \#1
+subtitle: Lead Paint Risk in Philadelphia for Communities of Color
 author: Sarah Busby
 format:
   pdf:
     colorlinks: true
 ---
 # Mapping disproportionate levels of lead paint risk in Philadelphia County
-As an old city, Philadelphia
+With its old buildings and legacy environmental contamination, Philadelphia has one of the [highest risks for lead exposure of any U.S. city](https://whyy.org/articles/philadelphia-children-lead-exposure/). Additionally, research has found lead to [disproportionately affect people of color and poorer communities](https://penntoday.upenn.edu/news/lead-toxicity-risk-factors-philadelphia). This analysis will focus on how lead paint risk factors relate to people of color in Philadelphia.
 
-**Objective:** Visualize the distribution between percent lead paint risk and percent people of color in Philadelphia County Census Blocks.
+**Objective:** Visualize the spatial correlation between percent lead paint risk and percent people of color across Philadelphia County Census Blocks.
 
 ## Load packages
 ```{r}
@@ -21,12 +21,13 @@ library(stars)
 ```
 
 ## Import data
-
+The Census block-level data from the US EPA's EJScreen is read.
 ```{r}
 # Read in geodatabase of EJScreen data at the Census Block Group level
 ejscreen <- sf::st_read(here::here("data", "ejscreen","EJSCREEN_2023_BG_StatePct_with_AS_CNMI_GU_VI.gdb")) 
 ```
 
+For the analysis, only data within Philadelphia County is needed.
 ```{r}
 # Filter to Pennsylvania
 pennsylvania <- ejscreen |> 
@@ -38,37 +39,51 @@ philadelphia <- ejscreen |>
 ```
 
 ## Visualize Data
+To visualize correlation, two maps will be made: one mapping the distribution of people of color, and one mapping the percentage of housing units built before 1960, a proxy for potential lead exposure since older homes are more likely to contain lead paint.
 ```{r}
 # Plot percent people of color at census block level
-pct_ppl_color <- tm_shape(philadelphia['Shape']) +
-    tm_borders() + 
-tm_shape(philadelphia['PEOPCOLORPCT']) +
-    tm_polygons(
-        fill = 'PEOPCOLORPCT',
-        fill.scale = tm_scale(values = 'Orange'),
-        fill.legend = tm_legend(title = "Percent people of color")) +
-tm_title("Percent people of color at census block level in Philadelphia County") +
-tm_compass() +
-tm_scalebar()
+pct_ppl_color <- tm_layout(asp = 0, inner.margins = 0.02) +
+    tm_shape(philadelphia['Shape']) +
+        tm_borders() + 
+    tm_shape(philadelphia['PEOPCOLORPCT']) +
+        tm_polygons(
+            fill = 'PEOPCOLORPCT',
+            fill.scale = tm_scale(values = 'Oranges'),
+            fill.legend = tm_legend(title = "Percent people of color", position = tm_pos_out('left'))
+            ) +
+    tm_title("Percent people of color \nin Philadelphia County") +
+    tm_compass() +
+    tm_scalebar()
+pct_ppl_color
 ```
 
 ```{r}
 # Plot percent housing units built before 1960 (lead risk)
-pct_pb_pnt <- tm_shape(philadelphia['Shape']) +
-    tm_borders() + 
-tm_shape(philadelphia['P_LDPNT']) +
-    tm_polygons(
-        fill = 'P_LDPNT',
-        fill.scale = tm_scale(values = 'Orange'),
-        fill.legend = tm_legend(title = "Percent housing units built before 1960 in Philadelphia"),
-        ) +
-tm_compass() +
-tm_scalebar()
+pct_pb_pnt <- tm_layout(asp = 0, inner.margins = 0.02) +
+    tm_shape(philadelphia['Shape']) +
+        tm_borders() + 
+    tm_shape(philadelphia['P_LDPNT']) +
+        tm_polygons(
+            fill = 'P_LDPNT',
+            fill.scale = tm_scale(values = 'Oranges'),
+            fill.legend = tm_legend(title = "Percent housing units \nbuilt before 1960", position = tm_pos_out('right')),
+            ) +
+    tm_title("Percent of housing units built \nbefore 1968 in Philadelphia County") +
+    tm_compass() +
+    tm_scalebar()
+pct_pb_pnt
 ```
 
-```{r}
-# Display maps side by side
-tmap_arrange(pct_ppl_color, pct_pb_pnt, ncol = 2)
-```
 
 ## Map interpretation
+From these two maps, one can see that the percentage of housing units built prior to 1960 and the percentage of people of color overlap very similarly in many Philadelphia neighborhoods. It is important to note that the data taken from EJScreen uses the percentage of pre-1960 houses as a proxy for lead exposure risks. It does not necessarily mean lead exposure risks compare exactly to this number. Factors not taken into account include homes that have been remediated, or additional legacy environmental contamination. Still, the maps reflect how one factor of lead paint risk correlates with people of color. This aligns with studies suggesting Black toddlers are most affected by high blood lead levels in Philadelphia (Schmidt, 2025). The disproportionate affect on Black residents and other people of color in part may come from the historic redlining of the city. Further analysis using the EJScreen could include comparing lead paint risk to other socioeconomic groups including children under the age of 5 and low-income residents.
+
+## References
+Baillie, K. U. (2022, April 12). Lead toxicity risk factors in Philadelphia. Penn Today. https://penntoday.upenn.edu/news/lead-toxicity-risk-factors-philadelphia  
+
+Schmidt, S. (2025, February 13). Philly children are exposed to dangerous lead more often than in other cities, analysis finds. WHYY. https://whyy.org/articles/philadelphia-children-lead-exposure/  
+
+
+## Data Citation
+United States Environmental Protection Agency. 2025. EJSCREEN. www.epa.gov/ejscreen.  
+**Link:** https://drive.google.com/file/d/1nG6Nj1bXfzQFOVMO8Km3eNy4SWu1YcIQ/view?usp=sharing

@@ -14,7 +14,7 @@ EDS223-HW1
 ## Data access
 The data used can be accessed as a zip file [here](https://drive.google.com/file/d/1nG6Nj1bXfzQFOVMO8Km3eNy4SWu1YcIQ/view?usp=sharing).
 
-## Analysis
+## Visualization and Analysis
 Script for visualization and analysis for the project can be found in `ej_screen.qmd` and rendered as `ej_screen.pdf`.
 
 ## References
