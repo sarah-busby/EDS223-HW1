@@ -40,12 +40,19 @@ philadelphia <- ejscreen |>
 
 ## Visualize Data
 To visualize correlation, two maps will be made: one mapping the distribution of people of color, and one mapping the percentage of housing units built before 1960, a proxy for potential lead exposure since older homes are more likely to contain lead paint.
+
+```{r}
+# Convert percent people of color from decimal to percentage
+pct_ppl_color <- philadelphia['PEOPCOLORPCT'] |> 
+    mutate(PEOPCOLORPCT = PEOPCOLORPCT * 100)
+```
+
 ```{r}
 # Plot percent people of color at census block level
-pct_ppl_color <- tm_layout(asp = 0, inner.margins = 0.02) +
+pct_ppl_color_map <- tm_layout(asp = 0, inner.margins = 0.02) +
     tm_shape(philadelphia['Shape']) +
         tm_borders() + 
-    tm_shape(philadelphia['PEOPCOLORPCT']) +
+    tm_shape(pct_ppl_color) +
         tm_polygons(
             fill = 'PEOPCOLORPCT',
             fill.scale = tm_scale(values = 'Oranges'),
@@ -54,12 +61,12 @@ pct_ppl_color <- tm_layout(asp = 0, inner.margins = 0.02) +
     tm_title("Percent people of color \nin Philadelphia County") +
     tm_compass() +
     tm_scalebar()
-pct_ppl_color
+pct_ppl_color_map
 ```
 
 ```{r}
 # Plot percent housing units built before 1960 (lead risk)
-pct_pb_pnt <- tm_layout(asp = 0, inner.margins = 0.02) +
+pct_pb_pnt_map <- tm_layout(asp = 0, inner.margins = 0.02) +
     tm_shape(philadelphia['Shape']) +
         tm_borders() + 
     tm_shape(philadelphia['P_LDPNT']) +
@@ -71,7 +78,7 @@ pct_pb_pnt <- tm_layout(asp = 0, inner.margins = 0.02) +
     tm_title("Percent of housing units built \nbefore 1968 in Philadelphia County") +
     tm_compass() +
     tm_scalebar()
-pct_pb_pnt
+pct_pb_pnt_map
 ```
 
 
